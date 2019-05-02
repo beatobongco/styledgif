@@ -24,25 +24,19 @@
       <p>
         Create short gifs from your webcam in the style of your favorite artist!
       </p>
-      <!-- <a href="#" id="whats-this">What's this?</a>
-      <p id="instructions">
-        Create short gifs from your webcam in the style of your favorite artist!
-        <ol>
-          <li>Choose a picture (or use the default).</li>
-          <li>Press start and strike a funny pose when the timer runs out!</li>
-          <li>Right click and save the gif and post it wherever your heart desires!</li>
-        </ol>
-      </p> -->
-      <h3>1. Upload a painting</h3>
-      <div class="style-container">
+      <section id="style-section">
+        <h3>1. Upload a painting</h3>
         <img id="style" src="img/starry.jpeg" />
         <br />
         <input id="style-input" type="file" />
-      </div>
-      <h3>2. Strike a pose on your webcam</h3>
-      <div class="capture-ui">
+        <br />
+        <button id="style-btn">Ok</button>
+      </section>
+
+      <section id="record-section" class="animated fadeInRight">
+        <h3>2. Strike a pose on your webcam</h3>
         <div class="gif-container">
-          <div class="spinner-container">
+          <div id="spinner-1" class="spinner-container">
             <p id="loading-text">Loading neural network...</p>
             <div class="lds-grid">
               <div></div>
@@ -61,11 +55,20 @@
         </div>
         <br />
         <button id="start-btn">Start</button>
-      </div>
-      <h3>3. Get your fresh GIF here!</h3>
-      <div class="out-container">
-        <img id="outfile" />
-      </div>
+      </section>
+
+      <section id="output-section" class="animated fadeInRight">
+        <h3>3. Get your fresh GIF here!</h3>
+        <div class="gif-container">
+          <div id="spinner-2" class="spinner-container">
+            <p id="rendering-text">Rendering GIF...</p>
+            <div class="lds-hourglass"></div>
+          </div>
+          <img id="outfile" />
+        </div>
+        <br />
+        <button id="reset-btn">Take another!</button>
+      </section>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
     <script src="main.js"></script>
