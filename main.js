@@ -1,24 +1,26 @@
-let MODE = 'capture'
-let IMAGES = []
-let GIF_LENGTH_MS = 200
+// Settings
+let GIF_LENGTH_MS = 2000
 let CAPTURE_INTERVAL = 200
-const model = new mi.ArbitraryStyleTransferNetwork()
-const videoEl = $('#inputVideo')
-const spinner = $('.spinner-container')
 
 function $(query) {
   return document.querySelector(query)
 }
 
-function reset() {
-  IMAGES = []
-  $('#outfile').src = ''
-  $('#start-btn').innerHTML = 'Start'
-  videoEl.style.display = 'block'
+function showSection(n) {
+  const sections = ['#style-section', '#record-section', '#output-section']
+  sections.forEach(s => {
+    $(s).style.display = 'none'
+  })
+
+  $(sections[n - 1]).style.display = 'block'
 }
 
-function delay(f, time = 100) {
-  setTimeout(f, time)
+/*
+  STYLE SECTION
+*/
+
+$('#style-btn').onclick = () => {
+  showSection(2)
 }
 
 $('#style-input').onchange = () => {
@@ -26,7 +28,34 @@ $('#style-input').onchange = () => {
   $('#style').src = url
 }
 
+/*
+  RECORD SECTION
+*/
+
+let IMAGES = []
+const model = new mi.ArbitraryStyleTransferNetwork()
+const videoEl = $('#inputVideo')
+
+function delay(f, time = 250) {
+  setTimeout(f, time)
+}
+
+function captureStill() {
+  requestAnimationFrame(() => {
+    const canvas = document.createElement('canvas')
+    canvas.height = videoEl.videoHeight
+    canvas.width = videoEl.videoWidth
+    canvas
+      .getContext('2d')
+      .drawImage(videoEl, 0, 0, canvas.width, canvas.height)
+    const img = new Image()
+    img.src = canvas.toDataURL()
+    IMAGES.push(img)
+  })
+}
+
 async function init() {
+  const spinner = $('#spinner-1')
   await model.initialize()
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: false,
@@ -37,66 +66,56 @@ async function init() {
   $('#start-btn').style.display = 'block'
 
   $('#start-btn').onclick = () => {
-    if (MODE === 'capture') {
-      const overlay = $('.overlay')
-      let countdown = 3
-      overlay.innerHTML = countdown
-      overlay.style.display = 'flex'
-      const countdownInterval = setInterval(function() {
+    const overlay = $('.overlay')
+    let countdown = 3
+    overlay.innerHTML = countdown
+    overlay.style.display = 'flex'
+    const countdownInterval = setInterval(function() {
+      requestAnimationFrame(() => {
+        overlay.innerHTML = countdown
+      })
+      countdown -= 1
+      if (countdown <= 0) {
+        clearInterval(countdownInterval)
         requestAnimationFrame(() => {
-          overlay.innerHTML = countdown
+          overlay.innerHTML = 'GO'
         })
-        countdown -= 1
-        if (countdown <= 0) {
-          clearInterval(countdownInterval)
-          requestAnimationFrame(() => {
-            overlay.innerHTML = 'GO'
-          })
-          delay(() => {
-            $('#start-btn').innerHTML = 'Please wait...'
-            $('#start-btn').disabled = true
-            overlay.style.display = 'none'
-            const start = performance.now()
-            const captureInterval = setInterval(() => {
-              captureStill()
-              if (performance.now() - start > GIF_LENGTH_MS) {
-                clearInterval(captureInterval)
-                requestAnimationFrame(() => {
-                  videoEl.style.display = 'none'
-                  spinner.style.display = 'block'
-                  $('#loading-text').innerHTML = ''
-                })
-                delay(() => {
-                  stylize(IMAGES)
-                })
-              }
-            }, CAPTURE_INTERVAL)
-          }, 250)
-        }
-      }, 1000)
-    } else if (MODE === 'ready') {
-      reset()
-      MODE = 'capture'
-    }
+        delay(() => {
+          $('#start-btn').style.display = 'none'
+          overlay.style.display = 'none'
+          const start = performance.now()
+          const captureInterval = setInterval(() => {
+            captureStill()
+            if (performance.now() - start > GIF_LENGTH_MS) {
+              clearInterval(captureInterval)
+              requestAnimationFrame(() => {
+                showSection(3)
+              })
+              delay(() => {
+                stylize(IMAGES)
+              }, 300)
+            }
+          }, CAPTURE_INTERVAL)
+        })
+      }
+    }, 1000)
   }
 }
 
-function captureStill() {
-  requestAnimationFrame(() => {
-    var canvas = document.createElement('canvas')
-    canvas.height = videoEl.videoHeight
-    canvas.width = videoEl.videoWidth
-    var ctx = canvas.getContext('2d')
-    ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height)
-    var img = new Image()
-    img.src = canvas.toDataURL()
-    IMAGES.push(img)
-  })
+/*
+  OUTPUT SECTION
+*/
+
+$('#reset-btn').onclick = () => {
+  showSection(1)
+  IMAGES = []
+  $('#outfile').src = ''
+  $('#start-btn').style.display = 'block'
+  $('#spinner-2').style.display = 'block'
+  $('#rendering-text').style.display = 'block'
 }
 
-// STYLIZE
 async function stylize(imgArr) {
-  const styleImg = $('#style')
   const start = performance.now()
   const gif = new GIF({
     workers: 2,
@@ -104,34 +123,36 @@ async function stylize(imgArr) {
   })
 
   gif.on('finished', function(blob) {
-    const img = $('#outfile')
-    img.src = URL.createObjectURL(blob)
-    spinner.style.display = 'none'
-    MODE = 'ready'
-    $('#start-btn').disabled = false
-    $('#start-btn').innerHTML = 'Take another'
+    $('#outfile').src = URL.createObjectURL(blob)
+    $('#rendering-text').style.display = 'none'
+    $('#spinner-2').style.display = 'none'
   })
 
   let counter = 0
+  const stylizedImgs = []
   for (const img of imgArr) {
     requestAnimationFrame(() => {
       counter++
-      $('#loading-text').innerHTML = `Rendering ${counter} of ${
+      $('#rendering-text').innerHTML = `Rendering ${counter} of ${
         imgArr.length
       } frames...`
     })
-    const imageData = await model.stylize(img, styleImg)
-    const canvas = document.createElement('canvas')
-    canvas.height = videoEl.videoHeight
-    canvas.width = videoEl.videoWidth
-    const ctx = canvas.getContext('2d')
-    ctx.putImageData(imageData, 0, 0)
-    gif.addFrame(imageData, { frameDelay: CAPTURE_INTERVAL })
-    if (counter === imgArr.length) {
-      gif.render()
-      console.log(`Took ${(performance.now() - start) / 1000} seconds`)
-    }
+    stylizedImgs.push(await model.stylize(img, $('#style')))
   }
+
+  stylizedImgs.forEach(img => {
+    gif.addFrame(img, {
+      delay: CAPTURE_INTERVAL / 2
+    })
+  })
+  stylizedImgs.reverse()
+  stylizedImgs.forEach(img => {
+    gif.addFrame(img, {
+      delay: CAPTURE_INTERVAL / 2
+    })
+  })
+  gif.render()
+  console.log(`Took ${(performance.now() - start) / 1000} seconds`)
 }
 
 init()
