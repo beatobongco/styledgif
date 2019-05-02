@@ -59,7 +59,7 @@ async function init() {
   await model.initialize()
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: false,
-    video: { width: 200, height: 200 }
+    video: { width: { ideal: 200 }, height: { ideal: 200 }, facingMode: 'user' }
   })
   videoEl.srcObject = stream
   spinner.style.display = 'none'
