@@ -2,7 +2,7 @@
   position: relative;
   width: 64px;
   height: 64px;
-  margin: 0 auto;
+  margin: 32px auto;
 }
 .lds-grid div {
   position: absolute;
