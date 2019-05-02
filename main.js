@@ -125,6 +125,7 @@ async function stylize(imgArr) {
   gif.on('finished', function(blob) {
     $('#outfile').src = URL.createObjectURL(blob)
     $('#rendering-text').style.display = 'none'
+    $('#rendering-text').innerHTML = 'Rendering GIF...'
     $('#spinner-2').style.display = 'none'
   })
 
