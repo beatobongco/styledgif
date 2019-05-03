@@ -65,16 +65,11 @@
         Create short gifs from your webcam in the style of your favorite artist!
       </p>
       <p>
-        How does this work? It's a
-        <a href="https://www.youtube.com/watch?v=aircAruvnKk">neural network</a
-        >. Credits to
-        <a href="https://reiinakano.github.io/arbitrary-image-stylization-tfjs/"
-          >@reiinakano</a
-        >
-        for the model. 🙇
+        Don't worry, none of your data is stored! 🕵️
       </p>
+
       <section id="style-section">
-        <h3>1. Upload a painting</h3>
+        <h3>1. Upload a painting (or just use the default!)</h3>
         <img id="style" src="img/pen.jpeg" />
         <br />
         <input id="style-input" type="file" />
@@ -83,7 +78,8 @@
       </section>
 
       <section id="record-section" class="animated fadeInRight">
-        <h3>2. Strike a pose on your webcam</h3>
+        <h3>2. Let's take a 2 second video!</h3>
+        <p>Press "Start" and make a funny move when you see "GO"</p>
         <div class="gif-container">
           <div id="spinner-1" class="spinner-container">
             <p id="loading-text">Loading neural network...</p>
@@ -115,8 +111,20 @@
           </div>
           <img id="outfile" />
         </div>
-        <br />
-        <button id="reset-btn">Take another!</button>
+        <div id="reset-div">
+          <p>
+            How does this work? It's a
+            <a href="https://www.youtube.com/watch?v=aircAruvnKk"
+              >neural network</a
+            >. Credits to
+            <a
+              href="https://reiinakano.github.io/arbitrary-image-stylization-tfjs/"
+              >@reiinakano</a
+            >
+            for the model. 🙇
+          </p>
+          <button id="reset-btn">Take another!</button>
+        </div>
       </section>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@magenta/image@^0.2.1"></script>

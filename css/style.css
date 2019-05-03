@@ -27,7 +27,7 @@ video {
 }
 #record-section,
 #output-section,
-#reset-btn {
+#reset-div {
   display: none;
 }
 .spinner-container {

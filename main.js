@@ -117,7 +117,7 @@ $('#reset-btn').onclick = () => {
   $('#start-btn').style.display = 'block'
   $('#spinner-2').style.display = 'block'
   $('#rendering-text').style.display = 'block'
-  $('#reset-btn').style.display = 'none'
+  $('#reset-div').style.display = 'none'
 }
 
 async function stylize(imgArr) {
@@ -132,7 +132,7 @@ async function stylize(imgArr) {
     $('#rendering-text').style.display = 'none'
     $('#rendering-text').innerHTML = 'Rendering GIF...'
     $('#spinner-2').style.display = 'none'
-    $('#reset-btn').style.display = 'block'
+    $('#reset-div').style.display = 'block'
   })
 
   let counter = 0
