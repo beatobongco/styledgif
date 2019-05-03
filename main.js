@@ -60,7 +60,7 @@ async function init() {
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: false,
     video: {
-      width: { ideals: 200 },
+      width: { ideal: 200 },
       height: { ideal: 200 },
       facingMode: 'user'
     }
