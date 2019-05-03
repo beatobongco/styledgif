@@ -70,6 +70,7 @@ async function init() {
   $('#start-btn').style.display = 'block'
 
   $('#start-btn').onclick = () => {
+    $('#start-btn').style.display = 'none'
     const overlay = $('.overlay')
     let countdown = 3
     overlay.innerHTML = countdown
